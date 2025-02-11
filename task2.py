@@ -21,3 +21,62 @@ Casey           cat             Siberian        8    m          true            
 Friend          cat             Domestic        4    m          false               102
 Copper          dog             Beagle          12   m          true                104
 """
+
+import sqlite3
+
+conn = sqlite3.connect('sigma.db')
+
+cur = conn.cursor()
+
+cur.execute(
+    '''
+    CREATE TABLE IF NOT EXISTS pets (
+    name TEXT,
+    species TEXT,
+    breed TEXT,
+    age INTEGER,
+    gender TEXT,
+    neutered BOOL,
+    ownerID INTEGER
+    );
+''')
+
+cur.execute(
+    '''
+    INSERT OR IGNORE INTO pets 
+    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''',
+    ('Fluffy', 'dog', 'Pomeraniam', 5, 'm', True, 101)
+)
+
+cur.execute(
+    '''
+    INSERT OR IGNORE INTO pets 
+    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''',
+    ('Benjamin', 'cat', 'Siberian', 8, 'm', True, 103)
+)
+
+cur.execute(
+    '''
+    INSERT OR IGNORE INTO pets 
+    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''',
+    ('Casey', 'cat', 'Siberian', 8, 'm', True, 103)
+)
+
+cur.execute(
+    '''
+    INSERT OR IGNORE INTO pets 
+    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''',
+    ('Friend', 'cat', 'Domestic', 4, 'm', False, 102)
+)
+
+conn.commit()
+
+cur.execute("SELECT * FROM pets")
+print(cur.fetchall())
+
+# Close the connection
+conn.close()
