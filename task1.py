@@ -22,58 +22,35 @@ Jen Mezei       jen@shaw.ca     6042231134      104     891 Cullen Cresc        
 
 import sqlite3
 
-conn = sqlite3.connect('sigma.db')
+conn = sqlite3.connect("veterinarian.db")
+cursor = conn.cursor()
 
-cur = conn.cursor()
-
-cur.execute(
-    '''
-    CREATE TABLE IF NOT EXISTS clinic (
-    name TEXT,
-    email TEXT UNIQUE,
-    phone_number INTEGER UNIQUE,
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    adress TEXT,
-    balance INTEGER
-    );
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS customers (
+    id INTEGER PRIMARY KEY,
+    owner_name TEXT,
+    owner_email TEXT UNIQUE,
+    owner_phone TEXT,
+    owner_customer_id INTEGER UNIQUE,
+    owner_address TEXT,
+    owner_balance REAL
+)
 ''')
 
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO clinic 
-    (name, email, phone_number, id, adress, balance) VALUES (?, ?, ?, ?, ?, ?)
-    ''',
-    ('Joe Smith', 'joe@gmail.com', 7783341111, 101, '1234 Sesame Street', 0)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO clinic 
-    (name, email, phone_number, id, adress, balance) VALUES (?, ?, ?, ?, ?, ?)
-    ''',
-    ('Fred Jones', 'fred@city.com', 6045553434, 102, '75 57 Street', 0)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO clinic 
-    (name, email, phone_number, id, adress, balance) VALUES (?, ?, ?, ?, ?, ?)
-    ''',
-    ('Leroy Jenkins', 'leroy@wow.ca', 2342222323, 103, '65 Blizzard Ave', 100)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO clinic 
-    (name, email, phone_number, id, adress, balance) VALUES (?, ?, ?, ?, ?, ?)
-    ''',
-    ('Jen Mezei', 'jen@shaw.ca', 6042231134, 104, '891 Cullen Cresc', 0)
-)
+#put it all in one go with executemany
+cursor.executemany('''
+INSERT OR IGNORE INTO customers (owner_name, owner_email, owner_phone, owner_customer_id, owner_address, owner_balance)
+VALUES (?, ?, ?, ?, ?, ?)
+''', [
+    ("Joe Smith", "joe@gmail.com", "7783341111", 101, "1234 Sesame Street", 0),
+    ("Fred Jones", "fred@city.com", "6045553434", 102, "75 57 Street", 0),
+    ("Leroy Jenkins", "leroy@wow.ca", "2342222323", 103, "65 Blizzard Ave", 100),
+    ("Jen Mezei", "jen@shaw.ca", "6042231134", 104, "891 Cullen Cresc", 0)
+])
 
 conn.commit()
 
-cur.execute("SELECT * FROM clinic")
-print(cur.fetchall())
+cursor.execute("SELECT * FROM customers")
+print(cursor.fetchall())
 
-# Close the connection
 conn.close()

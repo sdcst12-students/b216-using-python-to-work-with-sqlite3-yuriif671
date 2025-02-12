@@ -24,59 +24,51 @@ Copper          dog             Beagle          12   m          true            
 
 import sqlite3
 
-conn = sqlite3.connect('sigma.db')
+conn = sqlite3.connect('veterinarian.db')
+cursor = conn.cursor()
 
-cur = conn.cursor()
-
-cur.execute(
-    '''
-    CREATE TABLE IF NOT EXISTS pets (
+#set up relationship between customers and pet
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS pets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     species TEXT,
     breed TEXT,
     age INTEGER,
     gender TEXT,
-    neutered BOOL,
-    ownerID INTEGER
-    );
+    spayed_neutered BOOLEAN,
+    owner_id INTEGER UNIQUE,
+    FOREIGN KEY (owner_id) REFERENCES customers (owner_customer_id)
+)
 ''')
 
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO pets 
-    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''',
-    ('Fluffy', 'dog', 'Pomeraniam', 5, 'm', True, 101)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO pets 
-    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''',
-    ('Benjamin', 'cat', 'Siberian', 8, 'm', True, 103)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO pets 
-    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''',
-    ('Casey', 'cat', 'Siberian', 8, 'm', True, 103)
-)
-
-cur.execute(
-    '''
-    INSERT OR IGNORE INTO pets 
-    (name, species, breed, age, gender, neutered, ownerID) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''',
-    ('Friend', 'cat', 'Domestic', 4, 'm', False, 102)
-)
+cursor.executemany('''
+INSERT OR IGNORE INTO pets (name, species, breed, age, gender, spayed_neutered, owner_id)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+''', [
+    ("Fluffy", "dog", "Pomeranian", 5, "m", True, 101),
+    ("Benjamin", "cat", "Siberian", 8, "m", True, 103),
+    ("Casey", "cat", "Siberian", 8, "m", True, 103),
+    ("Friend", "cat", "Domestic", 4, "m", False, 102),
+    ("Copper", "dog", "Beagle", 12, "m", True, 104)
+])
 
 conn.commit()
 
-cur.execute("SELECT * FROM pets")
-print(cur.fetchall())
+cursor.execute("SELECT * FROM pets")
+print(cursor.fetchall())
 
-# Close the connection
+
+####extra for fun
+#print owner pet relation 
+cursor.execute('''
+SELECT customers.owner_name, pets.name FROM customers
+JOIN pets ON customers.owner_customer_id = pets.owner_id
+''')
+data = cursor.fetchall()
+
+print("\n\nOwner, Pet name")
+for i in data:
+    print(i)
+
 conn.close()
